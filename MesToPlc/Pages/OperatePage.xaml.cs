@@ -44,88 +44,8 @@ namespace MesToPlc.Pages
         {
             InitializeComponent();
             this.Loaded += OperatePage_Loaded;
-            this.Unloaded += OperatePage_Unloaded;
-            this.LinkToMesTimer.Interval = new TimeSpan(0,0,10);
-            this.LinkToMesTimer.IsEnabled = true;
-            this.LinkToMesTimer.Tick += LinkToMesTimer_Tick;
-            this.LinkToPlcTimer.Interval = new TimeSpan(0,0,1);
-            this.LinkToPlcTimer.Tick += LinkToPlcTimer_Tick;
-            this.VerifyTimer.Interval = new TimeSpan(0, 0, 1);
-            this.VerifyTimer.Tick += VerifyTimer_Tick;
-            this.VerifyTimer.IsEnabled = true;
-            this.LinkToMesStateTimer.Interval = new TimeSpan(0, 0, 1);
-            this.LinkToMesStateTimer.Tick += LinkToMesStateTimer_Tick;
-            this.PlcState.Source = ConnectResult.Normal;
+            this.Unloaded += OperatePage_Unloaded;          
             this.MesState.Source = ConnectResult.Normal;
-            this.PlcDelayCount = 1;
-            this.MesDelayCount = 1;
-        }
-
-        private void LinkToMesStateTimer_Tick(object sender, EventArgs e)
-        {
-            if (this.MesDelayCount-- == 0)
-            {
-                this.MesDelayCount = 1;
-                this.MesState.Source = ConnectResult.Normal;
-                this.LinkToMesStateTimer.IsEnabled = false;
-                this.LinkToMesStateTimer.Stop();
-            }
-        }
-
-        private void VerifyTimer_Tick(object sender, EventArgs e)
-        {
-            HandInputVerify();
-        }
-
-        private void LinkToPlcTimer_Tick(object sender, EventArgs e)
-        {
-            if (this.PlcDelayCount-- == 0)
-            {
-                this.PlcDelayCount = 1;
-                this.PlcState.Source = ConnectResult.Normal;
-                this.LinkToPlcTimer.IsEnabled = false;
-                this.LinkToPlcTimer.Stop();
-            }
-        }
-
-        /// <summary>
-        ///  访问Mes定时器
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LinkToMesTimer_Tick(object sender, EventArgs e)
-        {
-            if(this.txtSerialNum.Text == "") return;
-            MesLoad mesload = new MesLoad();
-            MesLoadResult mesLoadResult = new MesLoadResult();
-            switch (mesload.GetData(out mesLoadResult, ini.ReadIni("Config", "MesInterface") + this.txtSerialNum.Text.Trim()))
-            {
-                case RequestResult.Success:
-                    SetMesState(ConnectResult.Success);
-                    this.AddLog("请求MES成功");
-                    break;
-                case RequestResult.Fail:
-                    SetMesState(ConnectResult.Fail);
-                    this.AddLog("请求MES系统没有响应");
-                    return;
-                default:
-                    break;
-            }
-            switch (mesLoadResult.Type)
-            {
-                case "S":
-                    this.txtModelNum.Text = mesLoadResult.MaterialCode;
-                    this.AddLog("MES返回型号：" + mesLoadResult.MaterialCode);
-                    this.GetChengXuHao(this.txtModelNum.Text);
-                    break;
-                case "E":
-                    SetMesState(ConnectResult.Fail);
-                    this.AddLog("未找到该序列号对应型号");
-                    break;
-                default:
-                    break;
-            }
-            HandInputVerify();
         }
 
         private void SetMesState(BitmapImage connectResult)
@@ -144,12 +64,8 @@ namespace MesToPlc.Pages
 
         private void OperatePage_Loaded(object sender, RoutedEventArgs e)
         {
-            this.btnSure.IsEnabled = false;
             string port = ini.ReadIni("Config", "Port");
             socketServer = new SocketServer();
-            this.txtSerialNumR.Text = ini.ReadIni("Response", "SerialNum");
-            this.txtModelNumR.Text = ini.ReadIni("Response", "ModelNum");
-            this.txtIndexR.Text = ini.ReadIni("Response", "Index");
             bool listenResult = socketServer.Listen(port);
             if(listenResult == false)
             {
@@ -184,39 +100,12 @@ namespace MesToPlc.Pages
                     characterConversion = new CharacterConversion();
                     this.socketServer.Send(this.socketClient, characterConversion.HexConvertToByte(backdata));
                     AddLog("返回PLC数据：" + backdata);
-                    CopyMesToPlc();
                 }
-                this.LinkToPlcTimer.Start();
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    this.PlcState.Source = ConnectResult.Success;
-                }));
             }
             catch
             {
                 AddLog("PLC请求数据失败");
-                this.LinkToPlcTimer.Start();
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    this.PlcState.Source = ConnectResult.Fail;
-                }));
             }
-        }
-
-        private void CopyMesToPlc()
-        {
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                this.txtIndex.Clear();
-                this.txtModelNum.Clear();
-                this.txtSerialNum.Clear();
-                this.txtSerialNumR.Text = ini.ReadIni("Request", "SerialNum");
-                this.txtModelNumR.Text = ini.ReadIni("Request", "ModelNum");
-                this.txtIndexR.Text = ini.ReadIni("Request", "Index");
-                ini.WriteIni("Response", "SerialNum", this.txtSerialNumR.Text);
-                ini.WriteIni("Response", "ModelNum", this.txtModelNumR.Text);
-                ini.WriteIni("Response", "Index", this.txtIndexR.Text);
-            }));
         }
 
         private void SocketServer_NewConnnectionEvent(Socket socket)
@@ -224,79 +113,6 @@ namespace MesToPlc.Pages
             socketClient = socket;
         }
 
-        private void HandInputVerify()
-        {
-            string commandText = "SELECT * FROM [User] Where Authority = '0'";
-            List<UserModel> users = sql.GetDataTable<UserModel>(commandText);
-            if (users == null) return;
-            foreach (var item in users)
-            {
-                if (ini.ReadIni("Config", "UserName") == item.UserName)
-                {
-                    this.HandInput.IsEnabled = true;
-                    return;
-                }
-            }
-            this.HandInput.IsEnabled = false;
-            //this.txtIndex.IsEnabled = false;
-            //this.txtModelNum.IsEnabled = false;
-        }
-
-        private void AddChengXuHao_DataBackEvent(ChengXuHaoModel chengXuHaoModel)
-        {
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                this.txtIndex.Text = chengXuHaoModel.ChengXuHao;
-                this.txtModelNum.Text = chengXuHaoModel.XingHao;
-                GetChengXuHao(chengXuHaoModel.XingHao);
-            }));
-        }
-
-        private void btnSure_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.txtModelNum.Text == "") return;
-            this.GetChengXuHao(this.txtModelNum.Text);
-        }
-
-        private void GetChengXuHao(string xinghao)
-        {
-            List<ChengXuHaoModel> chengXuHaoModels = sql.GetDataTable<ChengXuHaoModel>("select * from ChengXuHao");
-            foreach (var item in chengXuHaoModels)
-            {
-                if (this.txtModelNum.Text == item.XingHao)
-                {
-                    this.txtIndex.Text = item.ChengXuHao;
-                    ini.WriteIni("Request", "SerialNum", this.txtSerialNum.Text);
-                    ini.WriteIni("Request", "ModelNum", item.XingHao);
-                    ini.WriteIni("Request", "Index", item.ChengXuHao);
-                    AddLog("型号与成序号映射成功并保存");
-                    AddLog("型号：" + this.txtModelNum.Text);
-                    AddLog("程序号：" + item.ChengXuHao);
-                    return;
-                }
-            }
-            AddLog("未找到对应程序号");
-        }
-
-        private void HandInput_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.HandInput.IsChecked == true)
-            {
-                AddLog("已切换到手动输入");
-                this.btnSure.IsEnabled = true;
-                this.LinkToMesTimer.IsEnabled = false;
-                AddChengXuHao addChengXuHao = new AddChengXuHao();
-                addChengXuHao.DataBackEvent += AddChengXuHao_DataBackEvent;
-                ini.WriteIni("Config", "AddWindowShow", WindowShowState.ShowState.Select.ToString());
-                addChengXuHao.Show();
-            }
-            else
-            {
-                AddLog("已切换到自动请求");
-                //this.btnSure.IsEnabled = false;
-                this.LinkToMesTimer.IsEnabled = true;
-            }
-        }
 
         private void AddLog(string log)
         {
@@ -311,11 +127,14 @@ namespace MesToPlc.Pages
             }));
         }
 
+        /// <summary>
+        /// 清除日志
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             this.lstInfoLog.Items.Clear();
         }
-
-        
     }
 }

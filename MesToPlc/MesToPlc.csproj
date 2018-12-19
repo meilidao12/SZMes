@@ -60,9 +60,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AddChengXuHao.xaml.cs">
-      <DependentUpon>AddChengXuHao.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ChangeUser.xaml.cs">
       <DependentUpon>ChangeUser.xaml</DependentUpon>
     </Compile>
@@ -73,10 +70,6 @@
     <Compile Include="Register.xaml.cs">
       <DependentUpon>Register.xaml</DependentUpon>
     </Compile>
-    <Page Include="AddChengXuHao.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="ChangeUser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -164,34 +157,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resource\op.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resource\MES.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\PLC.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resource\型号.png" />
-    <Resource Include="Resource\序列号.png" />
-    <Resource Include="Resource\编号.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resource\GroupBoxBac.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resource\程序号.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resource\下载.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\Success.png" />
     <Resource Include="Resource\Fail.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resource\下载1.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\Normal.png" />
@@ -199,6 +175,14 @@
   <ItemGroup>
     <Resource Include="Resource\登陆按钮.png" />
     <Resource Include="Resource\登陆背景.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\cpk.png" />
+    <Resource Include="Resource\压力.png" />
+    <Resource Include="Resource\温度.png" />
+    <Resource Include="Resource\热量.png" />
+    <Resource Include="Resource\电压.png" />
+    <Resource Include="Resource\电流.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
