@@ -30,17 +30,15 @@ namespace MesToPlc.Pages
     public partial class OperatePage : Page
     {
         SqlHelper sql = new SqlHelper();
-        Socket socketClient;
-        SocketServer socketServer;
+        SocketClient socPlc;  //连接plc的socket
+        SocketClient socInstrument; //连接仪表的socket
         IniHelper ini = new IniHelper(System.AppDomain.CurrentDomain.BaseDirectory + @"\Set.ini");
         CharacterConversion characterConversion;
         DispatcherTimer LinkToMesTimer = new DispatcherTimer();
         DispatcherTimer LinkToMesStateTimer = new DispatcherTimer();
         DispatcherTimer LinkToPlcTimer = new DispatcherTimer();
         DispatcherTimer VerifyTimer = new DispatcherTimer();
-        int PlcDelayCount;
-        int MesDelayCount;
-        public OperatePage()
+       public OperatePage()
         {
             InitializeComponent();
             this.Loaded += OperatePage_Loaded;
@@ -59,21 +57,15 @@ namespace MesToPlc.Pages
 
         private void OperatePage_Unloaded(object sender, RoutedEventArgs e)
         {
-            socketClient.Close();
+            
         }
 
         private void OperatePage_Loaded(object sender, RoutedEventArgs e)
         {
             string port = ini.ReadIni("Config", "Port");
-            socketServer = new SocketServer();
-            bool listenResult = socketServer.Listen(port);
-            if(listenResult == false)
-            {
-                MessageBox.Show(string.Format("监听{0}口失败", port));
-            }
-            SimpleLogHelper.Instance.WriteLog(LogType.Info,"监听端口：" +  listenResult);
-            socketServer.NewConnnectionEvent += SocketServer_NewConnnectionEvent;
-            socketServer.NewMessage1Event += SocketServer_NewMessage1Event;
+            
+            
+            
         }
 
         private void SocketServer_NewMessage1Event(Socket socket, string Message)
@@ -95,24 +87,18 @@ namespace MesToPlc.Pages
                 string xinghao = MathHelperEx.StrToASCII1(ini.ReadIni("Request", "ModelNum"));
                 string xinghaolength = MathHelper.DecToHex((ini.ReadIni("Request", "ModelNum").Length * 2).ToString()).PadLeft(4, '0');
                 backdata += (chengxuhao + xinghaolength + xinghao).PadRight(104, 'F');
-                if (this.socketServer.IsConnected(this.socketClient))
-                {
-                    characterConversion = new CharacterConversion();
-                    this.socketServer.Send(this.socketClient, characterConversion.HexConvertToByte(backdata));
-                    AddLog("返回PLC数据：" + backdata);
-                }
+                //if (this.socketServer.IsConnected(this.socketClient))
+                //{
+                //    characterConversion = new CharacterConversion();
+                //    this.socketServer.Send(this.socketClient, characterConversion.HexConvertToByte(backdata));
+                //    AddLog("返回PLC数据：" + backdata);
+                //}
             }
             catch
             {
                 AddLog("PLC请求数据失败");
             }
         }
-
-        private void SocketServer_NewConnnectionEvent(Socket socket)
-        {
-            socketClient = socket;
-        }
-
 
         private void AddLog(string log)
         {

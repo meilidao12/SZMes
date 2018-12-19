@@ -49,21 +49,17 @@ namespace MesToPlc
             MenuItem menuItem = (MenuItem)e.OriginalSource;
             switch (menuItem.Name)
             {
-                case "RegisterUser":
-                    Login("Register");
-                    break;
-                case "ChangeUser":
-                    Login("ChangeUser");
-                    break;
+                //case "RegisterUser":
+                //    Login("Register");
+                //    break;
+                //case "ChangeUser":
+                //    Login("ChangeUser");
+                //    break;
                 case "MenuClose":
                     if (MessageBox.Show("是否关闭此程序?", "消息提示", MessageBoxButton.OKCancel) == MessageBoxResult.OK) Application.Current.Shutdown();
                     break;
                 case "MenuMin":
                     this.WindowState = WindowState.Minimized;
-                    break;
-                case "AddChengXuHao":
-                    ini.WriteIni("Config", "AddWindowShow", WindowShowState.ShowState.Add.ToString());
-                    Login("AddChengXuHao");
                     break;
             }
         }
