@@ -1,0 +1,37 @@
+﻿<Window x:Class="MesToPlc.ChangeUser"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MesToPlc"
+        mc:Ignorable="d"
+        Title="切换用户" Height="200" Width="350" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,10"></Setter>
+            <Setter Property="Orientation" Value="Horizontal"></Setter>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Width" Value="200"></Setter>
+            <Setter Property="Height" Value="30"></Setter>
+            <Setter Property="FontSize" Value="20"></Setter>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Width" Value="80"></Setter>
+            <Setter Property="FontSize" Value="20"></Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <StackPanel Orientation="Vertical" Margin="10">
+            <StackPanel>
+                <TextBlock Name="tbUserName">用户名</TextBlock>
+                <TextBox Name="txtUserName"></TextBox>
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Name="tbPassWord">密码</TextBlock>
+                <TextBox Name="txtPassWord"></TextBox>
+            </StackPanel>
+            <Button Click="Button_Click"  Width="100" Height="30" FontSize="20" Margin="0,10">切换</Button>
+        </StackPanel>
+    </Grid>
+</Window>

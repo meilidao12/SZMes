@@ -1,0 +1,37 @@
+﻿<Window x:Class="MesToPlc.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MesToPlc"
+        xmlns:wpfsource="clr-namespace:WpfResource.Resource;assembly=WpfResource"
+        mc:Ignorable="d"
+        Title="焊机加工文件配置软件" Height="701" Width="901" WindowStartupLocation="CenterScreen"
+        WindowStyle="None"  AllowsTransparency="True"  Background="#7D7D7D" MouseDown="Window_MouseDown">
+    <Window.Resources>
+        <Style BasedOn="{StaticResource MenuStyle1}" TargetType="Menu">
+            <Setter Property="wpfsource:ControlAttachProperty.CornerRadius" Value="6"></Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border Name="Title" Background="White">
+            <TextBlock FontSize="30" VerticalAlignment="Center" Margin="20,0">焊机加工文件配置软件</TextBlock>
+        </Border>
+        <Menu Name="设置"  BorderThickness="2" Background="White" Width="100" Grid.Row="1" HorizontalAlignment="Left" MenuItem.Click="Menu_Click">
+            <MenuItem Header="设置" FontSize="30" Margin="9,5">
+                <!--菜单项为MenuItem，文字使用属性 Header-->
+                <MenuItem Name="MenuClose" Header="关闭" Margin="0,5"></MenuItem>
+                <MenuItem Name="MenuMin" Header="最小化" Margin="0,5"></MenuItem>
+                <MenuItem Name="RegisterUser" Header="注册新用户" Margin="0,5"></MenuItem>
+                <MenuItem Name="ChangeUser" Header="切换新用户" Margin="0,5"></MenuItem>
+                <MenuItem Name="AddChengXuHao" Header="添加型号与程序号" Margin="0,5"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <Frame Name="frm"  NavigationUIVisibility="Hidden" Grid.Row="2"></Frame>
+    </Grid>
+</Window>
