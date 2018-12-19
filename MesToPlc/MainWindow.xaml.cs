@@ -34,7 +34,7 @@ namespace MesToPlc
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            Login(this.loginUrl);
+            //Login(this.loginUrl);
             this.frm.Source = new Uri(operatepage, UriKind.Relative);
         }
 

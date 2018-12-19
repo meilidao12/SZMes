@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:MesToPlc"
         xmlns:wpfsource="clr-namespace:WpfResource.Resource;assembly=WpfResource"
         mc:Ignorable="d"
-        Title="焊机加工文件配置软件" Height="701" Width="901" WindowStartupLocation="CenterScreen"
+        Title="焊机加工文件配置软件" Height="721" Width="901" WindowStartupLocation="CenterScreen"
         WindowStyle="None"  AllowsTransparency="True"  Background="#7D7D7D" MouseDown="Window_MouseDown">
     <Window.Resources>
         <Style BasedOn="{StaticResource MenuStyle1}" TargetType="Menu">
@@ -16,7 +16,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"></RowDefinition>
-            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="60"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <Border Name="Title" Background="White">
