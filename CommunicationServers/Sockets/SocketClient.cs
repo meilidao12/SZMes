@@ -44,7 +44,8 @@ namespace CommunicationServers.Sockets
             }
             try
             {
-                Socket.Connect(ip, Convert.ToInt32(Port));
+                //Socket.BeginConnect(ip,)
+                //Socket.Connect(ip, Convert.ToInt32(Port));
                 Socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveMessage), Socket);
                 return true;
             }
@@ -65,6 +66,7 @@ namespace CommunicationServers.Sockets
             try
             {
                 var length = socket.EndReceive(ar);
+                if (length == 0) throw new Exception();
                 Thread td = new Thread(() => {
                     byte[] message = new byte[length];
                     Array.Copy(buffer, message, length);
@@ -75,6 +77,7 @@ namespace CommunicationServers.Sockets
             }
             catch (Exception ex)
             {
+                clientSocket.Close();
                 if (ServerDisconnectedEvent != null) ServerDisconnectedEvent(socket);
             }
         }

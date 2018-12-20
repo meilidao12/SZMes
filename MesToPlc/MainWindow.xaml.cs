@@ -61,6 +61,9 @@ namespace MesToPlc
                 case "MenuMin":
                     this.WindowState = WindowState.Minimized;
                     break;
+                case "MenuSet":
+                    Login("MenuSet");
+                    break;
             }
         }
 

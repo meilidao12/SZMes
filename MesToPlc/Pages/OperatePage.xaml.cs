@@ -30,8 +30,9 @@ namespace MesToPlc.Pages
     public partial class OperatePage : Page
     {
         SqlHelper sql = new SqlHelper();
-        SocketClient socPlc;  //连接plc的socket
-        SocketClient socInstrument; //连接仪表的socket
+        SocketClientEx socPlc;  //连接plc的socket
+        SocketClientEx socInstrument; //连接仪表的socket
+        WorkHelper WorkHelper = new WorkHelper();
         IniHelper ini = new IniHelper(System.AppDomain.CurrentDomain.BaseDirectory + @"\Set.ini");
         CharacterConversion characterConversion;
         DispatcherTimer LinkToMesTimer = new DispatcherTimer();
@@ -62,10 +63,85 @@ namespace MesToPlc.Pages
 
         private void OperatePage_Loaded(object sender, RoutedEventArgs e)
         {
-            string port = ini.ReadIni("Config", "Port");
+            //---
+            VerifyTimer.Interval = TimeSpan.FromSeconds(2);
+            VerifyTimer.Tick += VerifyTimer_Tick;
+            //---定义连接plc的socket
+            string plcPort = ini.ReadIni(Set.ConfigTCP, Set.PLCPort);
+            string plcIp = ini.ReadIni(Set.ConfigTCP, Set.PLCIP);
+            socPlc = new SocketClientEx();
+            socPlc.NewMessageEvent += SocPlc_NewMessageEvent;
+            socPlc.ServerDisconnectedEvent += SocPlc_ServerDisconnectedEvent;
+            socPlc.Connnect(plcPort, plcIp);
+            //---定义连接仪表的socket
+            string YiBiaoPort = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoPort);
+            string YiBiaoIP = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoIP);
+            socInstrument = new SocketClientEx();
+            socInstrument.ServerDisconnectedEvent += SocInstrument_ServerDisconnectedEvent;
+            socInstrument.NewMessageEvent += SocInstrument_NewMessageEvent;
+            socInstrument.Connnect(YiBiaoPort, YiBiaoIP);
+            VerifyTimer.Start();
             
+        }
+
+        private void SocInstrument_NewMessageEvent(Socket socket, byte[] Message)
+        {
             
-            
+        }
+
+        private void SocInstrument_ServerDisconnectedEvent(Socket socket)
+        {
+            AddLog("与仪表连接中断");
+        }
+
+        private void SocPlc_NewMessageEvent(Socket socket, byte[] Message)
+        {
+            AddLog(socPlc.ByteConvertToString(Message));
+            AddLog(Message.Length.ToString());
+        }
+
+        private void SocPlc_ServerDisconnectedEvent(Socket socket)
+        {
+            AddLog("与PLC连接中断");
+        }
+
+        /// <summary>
+        /// 检测与plc和仪表的通讯状态，如果通讯中断，则重新连接
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void VerifyTimer_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!socPlc.IsConnected())
+                {
+                    AddLog("与plc连接中断，重新开始连接");
+                    string plcPort = ini.ReadIni(Set.ConfigTCP, Set.PLCPort);
+                    string plcIp = ini.ReadIni(Set.ConfigTCP, Set.PLCIP);
+                    socPlc.Connnect(plcPort, plcIp);
+                }
+                else
+                {
+                    AddLog("plc目前状态：连通");
+                }
+                if (!socInstrument.IsConnected())
+                {
+                    AddLog("与仪表连接中断，重新开始连接");
+                    string YiBiaoPort = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoPort);
+                    string YiBiaoIP = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoIP);
+                    socInstrument.Connnect(YiBiaoPort, YiBiaoIP);
+                }
+                else
+                {
+                    AddLog("仪表目前连接状态：连通");
+                }
+            }
+            catch (Exception ex)
+            {
+                SimpleLogHelper.Instance.WriteLog(LogType.Error, ex);
+            }
+                
         }
 
         private void SocketServer_NewMessage1Event(Socket socket, string Message)
@@ -121,6 +197,33 @@ namespace MesToPlc.Pages
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             this.lstInfoLog.Items.Clear();
+        }
+
+        private void txtBianHao_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if(string.IsNullOrEmpty(this.txtBianHao.Text))
+            {
+                return;
+            }
+            if(this.WorkHelper.HandInput)
+            {
+                this.WorkHelper.HandInput = false;
+                this.txtBianHao.Text = "";
+                return;
+            }
+            this.WorkHelper.WorkFlag = true;
+            AddLog("开始焊接新的工件");
+        }
+
+        private void txtBianHao_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            this.WorkHelper.HandInput = true;
+            MessageBox.Show("禁止直接在文本框中输入");
+        }
+
+        private void btnClearBianHao_Click(object sender, RoutedEventArgs e)
+        {
+            this.txtBianHao.Text = "";
         }
     }
 }

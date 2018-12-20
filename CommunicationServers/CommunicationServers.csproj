@@ -60,6 +60,7 @@
     <Compile Include="Pipe\PipeHelper.cs" />
     <Compile Include="Pipe\PipeServerHelper.cs" />
     <Compile Include="Sockets\SocketClient.cs" />
+    <Compile Include="Sockets\SocketClientEx.cs" />
     <Compile Include="Sockets\SocketServer.cs" />
     <Compile Include="Sockets\SocketServerEx.cs" />
     <Page Include="MainWindow.xaml">
