@@ -240,6 +240,17 @@ namespace MesToPlc.Pages
         {
             this.txtBianHao.Text = this.txtBianHaoHandInput.Text;
             this.txtBianHaoHandInput.Text = "";
+            //---
+            InstrumentParameters par = new InstrumentParameters()
+            {
+                Current = "1",
+                Cpk = "2",
+                Voltage = "3",
+                Temperature = "4",
+                Pressure = "5",
+                Heat = "6"
+            };
+            JsonHelper.AppendWrite<InstrumentParameters>(par);
         }
     }
 }
