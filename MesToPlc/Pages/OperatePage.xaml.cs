@@ -39,6 +39,7 @@ namespace MesToPlc.Pages
         DispatcherTimer LinkToMesStateTimer = new DispatcherTimer();
         DispatcherTimer LinkToPlcTimer = new DispatcherTimer();
         DispatcherTimer VerifyTimer = new DispatcherTimer();
+        
        public OperatePage()
         {
             InitializeComponent();
@@ -71,13 +72,11 @@ namespace MesToPlc.Pages
             string plcIp = ini.ReadIni(Set.ConfigTCP, Set.PLCIP);
             socPlc = new SocketClientEx();
             socPlc.NewMessageEvent += SocPlc_NewMessageEvent;
-            socPlc.ServerDisconnectedEvent += SocPlc_ServerDisconnectedEvent;
             socPlc.Connnect(plcPort, plcIp);
             //---定义连接仪表的socket
             string YiBiaoPort = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoPort);
             string YiBiaoIP = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoIP);
             socInstrument = new SocketClientEx();
-            socInstrument.ServerDisconnectedEvent += SocInstrument_ServerDisconnectedEvent;
             socInstrument.NewMessageEvent += SocInstrument_NewMessageEvent;
             socInstrument.Connnect(YiBiaoPort, YiBiaoIP);
             VerifyTimer.Start();
@@ -89,20 +88,10 @@ namespace MesToPlc.Pages
             
         }
 
-        private void SocInstrument_ServerDisconnectedEvent(Socket socket)
-        {
-            AddLog("与仪表连接中断");
-        }
-
         private void SocPlc_NewMessageEvent(Socket socket, byte[] Message)
         {
             AddLog(socPlc.ByteConvertToString(Message));
             AddLog(Message.Length.ToString());
-        }
-
-        private void SocPlc_ServerDisconnectedEvent(Socket socket)
-        {
-            AddLog("与PLC连接中断");
         }
 
         /// <summary>
@@ -135,6 +124,12 @@ namespace MesToPlc.Pages
                 else
                 {
                     AddLog("仪表目前连接状态：连通");
+                }
+                if(this.lstInfoLog.Items.Count >= 60)
+                {
+                    int ClearLstCount = lstInfoLog.Items.Count - 60;
+                    this.lstInfoLog.Items.RemoveAt(ClearLstCount);
+                    Debug.WriteLine(this.lstInfoLog.Items.Count);
                 }
             }
             catch (Exception ex)
@@ -185,7 +180,6 @@ namespace MesToPlc.Pages
                 Decorator decorator = (Decorator)VisualTreeHelper.GetChild(lstInfoLog, 0);
                 ScrollViewer scrollViewer = (ScrollViewer)decorator.Child;
                 scrollViewer.ScrollToEnd();
-                SimpleLogHelper.Instance.WriteLog(LogType.Info, log);
             }));
         }
 
