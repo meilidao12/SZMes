@@ -42,12 +42,12 @@
                             <Image Source="/Resource/编号.png" Width="60" Height="35"></Image>
                             <TextBox Name="txtBianHao" IsEnabled="True" TextChanged="txtBianHao_TextChanged"
                                   PreviewKeyDown="txtBianHao_PreviewKeyDown"></TextBox>
-                            <TextBlock FontFamily="/MesToPlc;component/#iconfont" Text="&#xe664;"></TextBlock>
+                            <TextBlock Name="txbHandInput" FontFamily="/MesToPlc;component/#iconfont" Text="&#xe664;" MouseDown="txbHandInput_MouseDown"></TextBlock>
                             <Image Name="MesState" Margin="80,10,10,10" Source="/Resource/Success.png" Width="50"></Image>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Visibility="Collapsed">
-                            <TextBox Name="txtBianHaoHandInput" Margin="110,0,0,0"></TextBox>
-                            <Button Name="btnClearBianHao" Click="btnClearBianHao_Click" FontSize="20" Margin="10,0" Padding="20,0">添加</Button>
+                        <StackPanel Name="spHandInput" Orientation="Horizontal" Visibility="Collapsed">
+                            <TextBox Name="txtBianHaoHandInput" IsEnabled="True" Margin="110,0,0,0"></TextBox>
+                            <Button Name="btnAddBianHao" Click="btnAddBianHao_Click"  FontSize="20" Margin="10,0" Padding="20,0">添加</Button>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="40,10,0,20">
                             <Image Source="/Resource/电流.png" Width="60" Height="35"></Image>

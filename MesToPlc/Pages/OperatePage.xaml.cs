@@ -213,6 +213,7 @@ namespace MesToPlc.Pages
             }
             this.WorkHelper.WorkFlag = true;
             AddLog("开始焊接新的工件");
+            //生成文件
         }
 
         private void txtBianHao_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -221,9 +222,24 @@ namespace MesToPlc.Pages
             MessageBox.Show("禁止直接在文本框中输入");
         }
 
-        private void btnClearBianHao_Click(object sender, RoutedEventArgs e)
+        private void txbHandInput_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            this.txtBianHao.Text = "";
+            if(this.spHandInput.Visibility == Visibility.Collapsed)
+            {
+                this.txbHandInput.Text = WorkHelper.DownArrow;
+                this.spHandInput.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                this.txbHandInput.Text = WorkHelper.UpArrow;
+                this.spHandInput.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void btnAddBianHao_Click(object sender, RoutedEventArgs e)
+        {
+            this.txtBianHao.Text = this.txtBianHaoHandInput.Text;
+            this.txtBianHaoHandInput.Text = "";
         }
     }
 }

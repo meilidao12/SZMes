@@ -41,5 +41,20 @@ namespace MesToPlc.Models
 
         private bool handInput;
 
+        public string UpArrow
+        {
+            get
+            {
+                return "\ue664";
+            }
+        }
+
+        public string DownArrow
+        {
+            get
+            {
+                return "\ue665";
+            }
+        }
     }
 }
