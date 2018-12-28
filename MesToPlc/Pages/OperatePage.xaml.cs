@@ -29,28 +29,26 @@ namespace MesToPlc.Pages
     /// </summary>
     public partial class OperatePage : Page
     {
-        SqlHelper sql = new SqlHelper();
-        SocketClientEx socPlc;  //连接plc的socket
-        SocketClientEx socInstrument; //连接仪表的socket
+        //SqlHelper sql = new SqlHelper();
+        //SocketClientEx socPlc;  //连接plc的socket
+        //SocketClientEx socInstrument; //连接仪表的socket
         WorkHelper WorkHelper = new WorkHelper();
         IniHelper ini = new IniHelper(System.AppDomain.CurrentDomain.BaseDirectory + @"\Set.ini");
         CharacterConversion characterConversion;
-        DispatcherTimer LinkToMesTimer = new DispatcherTimer();
-        DispatcherTimer LinkToMesStateTimer = new DispatcherTimer();
-        DispatcherTimer LinkToPlcTimer = new DispatcherTimer();
         DispatcherTimer VerifyTimer = new DispatcherTimer();
+        COMMHelper com = new COMMHelper();
+        
         
        public OperatePage()
         {
             InitializeComponent();
             this.Loaded += OperatePage_Loaded;
-            this.Unloaded += OperatePage_Unloaded;          
-            this.MesState.Source = ConnectResult.Normal;
+            this.Unloaded += OperatePage_Unloaded;
+            SetMesState(ConnectResult.Normal);
         }
 
         private void SetMesState(BitmapImage connectResult)
         {
-            this.LinkToMesStateTimer.Start();
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 this.MesState.Source = connectResult;
@@ -67,32 +65,56 @@ namespace MesToPlc.Pages
             //---
             VerifyTimer.Interval = TimeSpan.FromSeconds(2);
             VerifyTimer.Tick += VerifyTimer_Tick;
-            //---定义连接plc的socket
-            string plcPort = ini.ReadIni(Set.ConfigTCP, Set.PLCPort);
-            string plcIp = ini.ReadIni(Set.ConfigTCP, Set.PLCIP);
-            socPlc = new SocketClientEx();
-            socPlc.NewMessageEvent += SocPlc_NewMessageEvent;
-            socPlc.Connnect(plcPort, plcIp);
-            //---定义连接仪表的socket
-            string YiBiaoPort = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoPort);
-            string YiBiaoIP = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoIP);
-            socInstrument = new SocketClientEx();
-            socInstrument.NewMessageEvent += SocInstrument_NewMessageEvent;
-            socInstrument.Connnect(YiBiaoPort, YiBiaoIP);
+            ////---定义连接plc的socket
+            //string plcPort = ini.ReadIni(Set.ConfigTCP, Set.PLCPort);
+            //string plcIp = ini.ReadIni(Set.ConfigTCP, Set.PLCIP);
+            //socPlc = new SocketClientEx();
+            //socPlc.NewMessageEvent += SocPlc_NewMessageEvent;
+            //socPlc.Connnect(plcPort, plcIp);
+            ////---定义连接仪表的socket
+            //string YiBiaoPort = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoPort);
+            //string YiBiaoIP = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoIP);
+            //socInstrument = new SocketClientEx();
+            //socInstrument.NewMessageEvent += SocInstrument_NewMessageEvent;
+            //socInstrument.Connnect(YiBiaoPort, YiBiaoIP);
+            OpenPort();
+            com.DataReceiveEvent += Com_DataReceiveEvent;
             VerifyTimer.Start();
-            
         }
 
-        private void SocInstrument_NewMessageEvent(Socket socket, byte[] Message)
+        private void OpenPort()
         {
-            
+            string portName = ini.ReadIni(Set.RS485, Set.COM);
+            string baudRate = ini.ReadIni(Set.RS485, Set.BaudRate);
+            if (com.OpenPort(portName, baudRate))
+            {
+                AddLog("串口" + portName + "打开成功");
+            }
+            else
+            {
+                AddLog("串口" + portName + "打开失败");
+            }
         }
 
-        private void SocPlc_NewMessageEvent(Socket socket, byte[] Message)
+        private void Com_DataReceiveEvent(object sender, COMMEventArgs e)
         {
-            AddLog(socPlc.ByteConvertToString(Message));
-            AddLog(Message.Length.ToString());
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                SetMesState(ConnectResult.Success);
+            }));
+            AddLog("新数据:" + e.BackDataAsHex);
         }
+
+        //private void SocInstrument_NewMessageEvent(Socket socket, byte[] Message)
+        //{
+
+        //}
+
+        //private void SocPlc_NewMessageEvent(Socket socket, byte[] Message)
+        //{
+        //    AddLog(socPlc.ByteConvertToString(Message));
+        //    AddLog(Message.Length.ToString());
+        //}
 
         /// <summary>
         /// 检测与plc和仪表的通讯状态，如果通讯中断，则重新连接
@@ -103,33 +125,39 @@ namespace MesToPlc.Pages
         {
             try
             {
-                if (!socPlc.IsConnected())
+                //if (!socPlc.IsConnected())
+                //{
+                //    AddLog("与plc连接中断，重新开始连接");
+                //    string plcPort = ini.ReadIni(Set.ConfigTCP, Set.PLCPort);
+                //    string plcIp = ini.ReadIni(Set.ConfigTCP, Set.PLCIP);
+                //    socPlc.Connnect(plcPort, plcIp);
+                //}
+                //else
+                //{
+                //    AddLog("plc目前状态：连通");
+                //}
+                //if (!socInstrument.IsConnected())
+                //{
+                //    AddLog("与仪表连接中断，重新开始连接");
+                //    string YiBiaoPort = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoPort);
+                //    string YiBiaoIP = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoIP);
+                //    socInstrument.Connnect(YiBiaoPort, YiBiaoIP);
+                //}
+                //else
+                //{
+                //    AddLog("仪表目前连接状态：连通");
+                //}
+                //if(this.lstInfoLog.Items.Count >= 60)
+                //{
+                //    int ClearLstCount = lstInfoLog.Items.Count - 60;
+                //    this.lstInfoLog.Items.RemoveAt(ClearLstCount);
+                //    Debug.WriteLine(this.lstInfoLog.Items.Count);
+                //}
+                if(com.ComState == false)
                 {
-                    AddLog("与plc连接中断，重新开始连接");
-                    string plcPort = ini.ReadIni(Set.ConfigTCP, Set.PLCPort);
-                    string plcIp = ini.ReadIni(Set.ConfigTCP, Set.PLCIP);
-                    socPlc.Connnect(plcPort, plcIp);
-                }
-                else
-                {
-                    AddLog("plc目前状态：连通");
-                }
-                if (!socInstrument.IsConnected())
-                {
-                    AddLog("与仪表连接中断，重新开始连接");
-                    string YiBiaoPort = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoPort);
-                    string YiBiaoIP = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoIP);
-                    socInstrument.Connnect(YiBiaoPort, YiBiaoIP);
-                }
-                else
-                {
-                    AddLog("仪表目前连接状态：连通");
-                }
-                if(this.lstInfoLog.Items.Count >= 60)
-                {
-                    int ClearLstCount = lstInfoLog.Items.Count - 60;
-                    this.lstInfoLog.Items.RemoveAt(ClearLstCount);
-                    Debug.WriteLine(this.lstInfoLog.Items.Count);
+                    AddLog("串口目前状态关闭，尝试重新打开");
+                    com.ClosePort();
+                    OpenPort();
                 }
             }
             catch (Exception ex)
@@ -139,37 +167,37 @@ namespace MesToPlc.Pages
                 
         }
 
-        private void SocketServer_NewMessage1Event(Socket socket, string Message)
-        {
-            try
-            {
-                SimpleLogHelper.Instance.WriteLog(LogType.Info, Message);
-                if (Message.Length != 24) return;
-                AddLog("PLC数据请求" + Message);
-                ModbusTcpServer modbusTcpServer = new ModbusTcpServer();
-                modbusTcpServer.AffairID = Message.Substring(0, 4);
-                modbusTcpServer.ProtocolID = Message.Substring(4, 4);
-                int requestDataLength = MathHelper.HexToDec(Message.Substring(Message.Length - 4, 4)); //请求数据长度
-                modbusTcpServer.BackDataLength = MathHelper.DecToHex((requestDataLength * 2).ToString()).PadLeft(2, '0');
-                modbusTcpServer.SlaveId = Message.Substring(12, 2);
-                modbusTcpServer.Length = MathHelper.DecToHex((3 + requestDataLength * 2).ToString()).PadLeft(4, '0');
-                string backdata = modbusTcpServer.AffairID + modbusTcpServer.ProtocolID + modbusTcpServer.Length + modbusTcpServer.SlaveId + ModbusFunction.ReadHoldingRegisters + modbusTcpServer.BackDataLength;
-                string chengxuhao = MathHelper.DecToHex(ini.ReadIni("Request", "Index")).PadLeft(4, '0');
-                string xinghao = MathHelperEx.StrToASCII1(ini.ReadIni("Request", "ModelNum"));
-                string xinghaolength = MathHelper.DecToHex((ini.ReadIni("Request", "ModelNum").Length * 2).ToString()).PadLeft(4, '0');
-                backdata += (chengxuhao + xinghaolength + xinghao).PadRight(104, 'F');
-                //if (this.socketServer.IsConnected(this.socketClient))
-                //{
-                //    characterConversion = new CharacterConversion();
-                //    this.socketServer.Send(this.socketClient, characterConversion.HexConvertToByte(backdata));
-                //    AddLog("返回PLC数据：" + backdata);
-                //}
-            }
-            catch
-            {
-                AddLog("PLC请求数据失败");
-            }
-        }
+        //private void SocketServer_NewMessage1Event(Socket socket, string Message)
+        //{
+        //    try
+        //    {
+        //        SimpleLogHelper.Instance.WriteLog(LogType.Info, Message);
+        //        if (Message.Length != 24) return;
+        //        AddLog("PLC数据请求" + Message);
+        //        ModbusTcpServer modbusTcpServer = new ModbusTcpServer();
+        //        modbusTcpServer.AffairID = Message.Substring(0, 4);
+        //        modbusTcpServer.ProtocolID = Message.Substring(4, 4);
+        //        int requestDataLength = MathHelper.HexToDec(Message.Substring(Message.Length - 4, 4)); //请求数据长度
+        //        modbusTcpServer.BackDataLength = MathHelper.DecToHex((requestDataLength * 2).ToString()).PadLeft(2, '0');
+        //        modbusTcpServer.SlaveId = Message.Substring(12, 2);
+        //        modbusTcpServer.Length = MathHelper.DecToHex((3 + requestDataLength * 2).ToString()).PadLeft(4, '0');
+        //        string backdata = modbusTcpServer.AffairID + modbusTcpServer.ProtocolID + modbusTcpServer.Length + modbusTcpServer.SlaveId + ModbusFunction.ReadHoldingRegisters + modbusTcpServer.BackDataLength;
+        //        string chengxuhao = MathHelper.DecToHex(ini.ReadIni("Request", "Index")).PadLeft(4, '0');
+        //        string xinghao = MathHelperEx.StrToASCII1(ini.ReadIni("Request", "ModelNum"));
+        //        string xinghaolength = MathHelper.DecToHex((ini.ReadIni("Request", "ModelNum").Length * 2).ToString()).PadLeft(4, '0');
+        //        backdata += (chengxuhao + xinghaolength + xinghao).PadRight(104, 'F');
+        //        //if (this.socketServer.IsConnected(this.socketClient))
+        //        //{
+        //        //    characterConversion = new CharacterConversion();
+        //        //    this.socketServer.Send(this.socketClient, characterConversion.HexConvertToByte(backdata));
+        //        //    AddLog("返回PLC数据：" + backdata);
+        //        //}
+        //    }
+        //    catch
+        //    {
+        //        AddLog("PLC请求数据失败");
+        //    }
+        //}
 
         private void AddLog(string log)
         {
@@ -193,58 +221,63 @@ namespace MesToPlc.Pages
             this.lstInfoLog.Items.Clear();
         }
 
-        private void txtBianHao_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if(string.IsNullOrEmpty(this.txtBianHao.Text))
-            {
-                return;
-            }
-            if(this.WorkHelper.HandInput)
-            {
-                this.WorkHelper.HandInput = false;
-                this.txtBianHao.Text = "";
-                return;
-            }
-            this.WorkHelper.WorkFlag = true;
-            AddLog("开始焊接新的工件");
-            //生成文件
-        }
+        /// <summary>
+        /// 启动开始信号
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        //private void txtBianHao_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    if(string.IsNullOrEmpty(this.txtBianHao.Text))
+        //    {
+        //        return;
+        //    }
+        //    if(this.WorkHelper.HandInput)
+        //    {
+        //        this.WorkHelper.HandInput = false;
+        //        this.txtBianHao.Text = "";
+        //        return;
+        //    }
+        //    this.WorkHelper.WorkFlag = true;
+        //    AddLog("开始焊接新的工件");
+        //    //生成文件
+        //}
 
-        private void txtBianHao_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            this.WorkHelper.HandInput = true;
-            MessageBox.Show("禁止直接在文本框中输入");
-        }
+        //private void txtBianHao_PreviewKeyDown(object sender, KeyEventArgs e)
+        //{
+        //    this.WorkHelper.HandInput = true;
+        //    MessageBox.Show("禁止直接在文本框中输入");
+        //}
 
-        private void txbHandInput_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if(this.spHandInput.Visibility == Visibility.Collapsed)
-            {
-                this.txbHandInput.Text = WorkHelper.DownArrow;
-                this.spHandInput.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                this.txbHandInput.Text = WorkHelper.UpArrow;
-                this.spHandInput.Visibility = Visibility.Collapsed;
-            }
-        }
+        //private void txbHandInput_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    if(this.spHandInput.Visibility == Visibility.Collapsed)
+        //    {
+        //        this.txbHandInput.Text = WorkHelper.DownArrow;
+        //        this.spHandInput.Visibility = Visibility.Visible;
+        //    }
+        //    else
+        //    {
+        //        this.txbHandInput.Text = WorkHelper.UpArrow;
+        //        this.spHandInput.Visibility = Visibility.Collapsed;
+        //    }
+        //}
 
-        private void btnAddBianHao_Click(object sender, RoutedEventArgs e)
-        {
-            this.txtBianHao.Text = this.txtBianHaoHandInput.Text;
-            this.txtBianHaoHandInput.Text = "";
-            //---
-            InstrumentParameters par = new InstrumentParameters()
-            {
-                Current = "1",
-                Cpk = "2",
-                Voltage = "3",
-                Temperature = "4",
-                Pressure = "5",
-                Heat = "6"
-            };
-            JsonHelper.AppendWrite<InstrumentParameters>(par);
-        }
+        //private void btnAddBianHao_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.txtBianHao.Text = this.txtBianHaoHandInput.Text;
+        //    this.txtBianHaoHandInput.Text = "";
+        //    //---
+        //    //InstrumentParameters par = new InstrumentParameters()
+        //    //{
+        //    //    Current = "1",
+        //    //    Cpk = "2",
+        //    //    Voltage = "3",
+        //    //    Temperature = "4",
+        //    //    Pressure = "5",
+        //    //    Heat = "6"
+        //    //};
+        //    //JsonHelper.AppendWrite<InstrumentParameters>(par);
+        //}
     }
 }

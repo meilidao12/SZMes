@@ -82,6 +82,38 @@ namespace Services
                 File.AppendAllText(filename, string.Format("\r\n----------------------{0}--------------------------\r\n", now.ToString("yyyy-MM-dd HH:mm:ss")));
                 File.AppendAllText(filename, meg);
                 File.AppendAllText(filename, "\r\n----------------------footer--------------------------\r\n");
+                ClearOldLog();
+            }
+        }
+
+        public void ClearOldLog()
+        {
+            try
+            {
+                List<string> paths = new List<string>();
+                paths.Add(this.infoFilePath);
+                paths.Add(this.errorFilePath);
+                DirectoryInfo root;
+                FileInfo[] files;
+                foreach (var path in paths)
+                {
+                    root = new DirectoryInfo(path);
+                    files = root.GetFiles();
+                    if (files.Length != 0)
+                    {
+                        foreach (var item in files)
+                        {
+                            if (item.LastWriteTime <= DateTime.Now.AddDays(-30))
+                            {
+                                File.Delete(item.FullName);
+                            }
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+
             }
         }
     }

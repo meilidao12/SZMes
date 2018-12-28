@@ -15,6 +15,22 @@ namespace MesToPlc.Models
             }
         }
 
+        public static string COM
+        {
+            get
+            {
+                return "COM";
+            }
+        }
+
+        public static string BaudRate
+        {
+            get
+            {
+                return "BaudRate";
+            }
+        }
+
         public static string TCP
         {
             get
