@@ -29,20 +29,12 @@ namespace MesToPlc
 
         private void MenuSet_Loaded(object sender, RoutedEventArgs e)
         {
-            this.txtPLCIP.Text = ini.ReadIni(Set.ConfigTCP, Set.PLCIP);
-            this.txtPLCPort.Text = ini.ReadIni(Set.ConfigTCP, Set.PLCPort);
-            this.txtYiBiaoIP.Text = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoIP);
-            this.txtYiBiaoPort.Text = ini.ReadIni(Set.ConfigTCP, Set.YiBiaoPort);
+            
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            ini.WriteIni(Set.ConfigTCP, Set.PLCIP, this.txtPLCIP.Text);
-            ini.WriteIni(Set.ConfigTCP, Set.PLCPort, this.txtPLCPort.Text);
-            ini.WriteIni(Set.ConfigTCP, Set.YiBiaoIP, this.txtYiBiaoIP.Text);
-            ini.WriteIni(Set.ConfigTCP, Set.YiBiaoPort, this.txtYiBiaoPort.Text);
-            MessageBox.Show("保存成功");
-            this.Close();
+            
         }
     }
 }

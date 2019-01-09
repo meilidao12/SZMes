@@ -7,38 +7,6 @@ namespace MesToPlc.Models
 {
     public class Set
     {
-        public static string RS485
-        {
-            get
-            {
-                return "RS485";
-            }
-        }
-
-        public static string COM
-        {
-            get
-            {
-                return "COM";
-            }
-        }
-
-        public static string BaudRate
-        {
-            get
-            {
-                return "BaudRate";
-            }
-        }
-
-        public static string TCP
-        {
-            get
-            {
-                return "TCP/IP";
-            }
-        }
-
         public static string Config
         {
             get
@@ -47,59 +15,19 @@ namespace MesToPlc.Models
             }
         }
 
-        public static string Select
+        public static string NO
         {
             get
             {
-                return "Select";
+                return "NO";
             }
         }
 
-        public static string ConfigTCP
+        public static string Index
         {
             get
             {
-                return "ConfigTCP";
-            }
-        }
-
-        public static string PLCIP
-        {
-            get
-            {
-                return "PLCIP";
-            }
-        }
-
-        public static string PLCPort
-        {
-            get
-            {
-                return "PLCPort";
-            }
-        }
-
-        public static string YiBiaoIP
-        {
-            get
-            {
-                return "YiBiaoIP";
-            }
-        }
-
-        public static string YiBiaoPort
-        {
-            get
-            {
-                return "YiBiaoPort";
-            }
-        }
-
-        public static string Config485
-        {
-            get
-            {
-                return "Config485";
+                return "Index";
             }
         }
     }

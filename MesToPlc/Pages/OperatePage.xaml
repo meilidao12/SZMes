@@ -38,15 +38,15 @@
                         <ImageBrush ImageSource="/Resource/GroupBoxBac.png"></ImageBrush>
                     </GroupBox.Background>
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="40,15,0,0">
+                        <StackPanel Orientation="Horizontal" Margin="40,15,0,10">
                             <Image Source="/Resource/编号.png" Width="60" Height="35"></Image>
-                            <TextBox Name="txtBianHao" IsEnabled="True" ></TextBox>
-                            <TextBlock Name="txbHandInput" FontFamily="/MesToPlc;component/#iconfont" Text="&#xe664;" Visibility="Hidden"></TextBlock>
-                            <Image Name="MesState" Margin="80,10,10,10" Source="/Resource/Success.png" Width="50"></Image>
+                            <TextBox Name="txtBianHao" IsEnabled="True" TextChanged="txtBianHao_TextChanged"></TextBox>
+                            <Button FontSize="20" Padding="20,0" Height="35">重置</Button>
+                            <TextBlock Name="txbHandInput" Margin="10,0" FontFamily="/MesToPlc;component/#iconfont" Text="&#xe664;" Visibility="Visible"></TextBlock>
                         </StackPanel>
-                        <StackPanel Name="spHandInput" Orientation="Horizontal" Visibility="Collapsed">
+                        <StackPanel Name="spHandInput" Orientation="Horizontal" Visibility="Visible">
                             <TextBox Name="txtBianHaoHandInput" IsEnabled="True" Margin="110,0,0,0"></TextBox>
-                            <Button Name="btnAddBianHao"  FontSize="20" Margin="10,0" Padding="20,0">添加</Button>
+                            <Button Name="btnAddBianHao"  FontSize="20" Margin="10,0" Padding="20,0" Click="btnAddBianHao_Click">添加</Button>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="40,10,0,20">
                             <Image Source="/Resource/电流.png" Width="60" Height="35"></Image>
@@ -72,11 +72,6 @@
                             <Image Source="/Resource/温度.png" Width="60" Height="35"></Image>
                             <TextBox Name="txtWenDu"></TextBox>
                             <TextBlock>℃</TextBlock>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="40,10,0,0">
-                            <Image Source="/Resource/热量.png" Width="60" Height="35"></Image>
-                            <TextBox Name="txtReLiang"></TextBox>
-                            <TextBlock>KJ</TextBlock>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>

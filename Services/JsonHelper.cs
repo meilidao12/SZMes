@@ -10,28 +10,35 @@ namespace Services
 {
     public class JsonHelper
     {
-        //string serverAppPath = Request.PhysicalApplicationPath.ToString(); 
-        static string serverAppPath = @"d:\";
+        IniHelper ini = new IniHelper(System.AppDomain.CurrentDomain.BaseDirectory + @"\Set.ini");
+        string jsonpath = "";
         //构成配置文件路径 
-        static string  jsonpath =  serverAppPath + "config.json";
+        //static string  jsonpath =  serverAppPath + "config.json";
+
+        public JsonHelper()
+        {
+            jsonpath = ini.ReadIni("Config", "JsonUrl");
+        }
+
         /// <summary>
         /// 追加写入
         /// </summary>
         /// <typeparam name="Model"></typeparam>
         /// <param name="model"></param>
         /// <returns></returns>
-        public static bool AppendWrite<Model>(Model model)
+        public  bool AppendWrite<Model>(string name ,Model model)
         {
+            string path = jsonpath + name;
             string js1 = JsonConvert.SerializeObject(model);
-            if (!File.Exists(jsonpath))
+            if (!File.Exists(path))
             {
-                File.Create(jsonpath).Close();
+                File.Create(path).Close();
             }
-            File.AppendAllText(jsonpath, js1);
+            File.AppendAllText(path, js1);
             return true;
         }
 
-        public static bool Write<Model>(Model model)
+        public  bool Write<Model>(Model model)
         {
             string js1 = JsonConvert.SerializeObject(model);
             if (!File.Exists(jsonpath))

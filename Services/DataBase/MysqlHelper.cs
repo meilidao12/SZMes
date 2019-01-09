@@ -13,9 +13,11 @@ namespace Services.DataBase
     {
         MySqlConnection conn;
         //string Url = @"Server=10.0.1.234; Database=meterwater_data; Uid =tianchen; Password =tianchen;";
-        string Url = AppSetting.Get("MySqlUrl");
+        IniHelper ini = new IniHelper(System.AppDomain.CurrentDomain.BaseDirectory + @"\Set.ini");
+        string Url = "";
         public MysqlHelper()
         {
+            Url = ini.ReadIni("Config", "MySqlUrl");
             conn = new MySqlConnection(Url);
         }
 

@@ -12,10 +12,9 @@ namespace MesToPlc.Models
     {
         private string current;
         private string voltage;
-        private string cpk;
+        private string weldTime;
         private string pressure;
         private string temperature;
-        private string heat;
 
         /// <summary>
         /// 电流
@@ -46,22 +45,6 @@ namespace MesToPlc.Models
             set
             {
                 voltage = value;
-            }
-        }
-
-        /// <summary>
-        /// CPK
-        /// </summary>
-        public string Cpk
-        {
-            get
-            {
-                return cpk;
-            }
-
-            set
-            {
-                cpk = value;
             }
         }
 
@@ -98,18 +81,18 @@ namespace MesToPlc.Models
         }
 
         /// <summary>
-        /// 热量
+        /// 焊接时间
         /// </summary>
-        public string Heat
+        public string WeldTime
         {
             get
             {
-                return heat;
+                return weldTime;
             }
 
             set
             {
-                heat = value;
+                weldTime = value;
             }
         }
     }
