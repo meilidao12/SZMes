@@ -68,6 +68,7 @@
     </Compile>
     <Compile Include="Models\ConnectMesModel.cs" />
     <Compile Include="Models\InstrumentParameters.cs" />
+    <Compile Include="Models\Model.cs" />
     <Compile Include="Models\Set.cs" />
     <Compile Include="Models\WorkHelper.cs" />
     <Compile Include="Register.xaml.cs">

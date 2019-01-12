@@ -23,6 +23,7 @@ using MesToPlc;
 using System.Data;
 using System.Windows.Interop;
 
+
 namespace MesToPlc.Pages
 {
     
@@ -38,8 +39,7 @@ namespace MesToPlc.Pages
         CharacterConversion characterConversion;
         DispatcherTimer CollectTimer = new DispatcherTimer();
         JsonHelper jsonHelper = new JsonHelper();
-        IntPtr txtBianHaoHwnd;
-        IntPtr txtShoudongHwnd;
+        AccessHelper accessHelper = new AccessHelper();
         bool blClear = false;
        public OperatePage()
         {
@@ -97,22 +97,33 @@ namespace MesToPlc.Pages
                     this.txtWeldTime.Text = dt.Rows[0]["WELDTIME1"].ToString();
                 }
             }
+            else
+            {
+                SimpleLogHelper.Instance.WriteLog(LogType.Info, "检索条件：Select * FROM welddata_spot ORDER BY `ID` DESC LIMIT 1" + "，搜索数据为空");
+            }
         }
 
         private void AddLog(string log)
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                log = DateTime.Now + ": " + log;
-                this.lstInfoLog.Items.Add(log);
-                SimpleLogHelper.Instance.WriteLog(LogType.Info, log);
-                Decorator decorator = (Decorator)VisualTreeHelper.GetChild(lstInfoLog, 0);
-                ScrollViewer scrollViewer = (ScrollViewer)decorator.Child;
-                scrollViewer.ScrollToEnd();
-                if (this.lstInfoLog.Items.Count >= 60)
+                try
                 {
-                    int ClearLstCount = lstInfoLog.Items.Count - 60;
-                    this.lstInfoLog.Items.RemoveAt(ClearLstCount);
+                    log = DateTime.Now + ": " + log;
+                    this.lstInfoLog.Items.Add(log);
+                    SimpleLogHelper.Instance.WriteLog(LogType.Info, log);
+                    Decorator decorator = (Decorator)VisualTreeHelper.GetChild(lstInfoLog, 0);
+                    ScrollViewer scrollViewer = (ScrollViewer)decorator.Child;
+                    scrollViewer.ScrollToEnd();
+                    if (this.lstInfoLog.Items.Count >= 60)
+                    {
+                        int ClearLstCount = lstInfoLog.Items.Count - 60;
+                        this.lstInfoLog.Items.RemoveAt(ClearLstCount);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    SimpleLogHelper.Instance.WriteLog(LogType.Error, ex);
                 }
             }));
         }
@@ -147,13 +158,22 @@ namespace MesToPlc.Pages
                 blClear = false;
                 return;
             }
-                
             e.Handled = true;
-            //结束老的
-            FinishNow();
-            //开始新的
-            StartAnother();
-            blClear = false;
+            //检查是否是重复插入
+            string commandText = string.Format("Select * from Model Where BianHao='{0}'", this.txtBianHaoHandInput.Text);
+            List<Model> models = accessHelper.GetDataTable<Model>(commandText);
+            if(models.Count ==0)
+            {
+                //结束老的
+                FinishNow();
+                //开始新的
+                StartAnother();
+                blClear = false;
+            }
+            else
+            {
+                AddLog("该编号已存在");
+            }
         }
 
         /// <summary>
@@ -200,6 +220,10 @@ namespace MesToPlc.Pages
                 //读取数据库数据并保存的记录
                 if (!string.IsNullOrEmpty(id))
                 {
+                    if(sql.TestConn != true)
+                    {
+                        sql.Open();
+                    }
                     string commandtext = string.Format("Select * FROM welddata_spot where ID >= '{0}'", id);
                     DataTable dt = sql.GetDataTable1(commandtext);
                     if (dt != null)
@@ -217,6 +241,11 @@ namespace MesToPlc.Pages
                             };
                             this.jsonHelper.AppendWrite<InstrumentParameters>(index + ".json", par);
                         }
+                    }
+                    commandtext = string.Format("insert into model ([BianHao],[AddTime1]) values ('{0}','{1}')",txtBianHaoShow.Text,DateTime.Now);
+                    if(accessHelper.Execute(commandtext))
+                    {
+                        AddLog("数据保存成功");
                     }
                 }
                 this.txtWeldTime.Text = "";
