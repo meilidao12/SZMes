@@ -37,16 +37,19 @@
                     <GroupBox.Background>
                         <ImageBrush ImageSource="/Resource/GroupBoxBac.png"></ImageBrush>
                     </GroupBox.Background>
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="40,15,0,10">
+                    <StackPanel TextBox.PreviewKeyDown="StackPanel_TextChanged">
+                        <StackPanel Orientation="Horizontal" Margin="40,15,0,0">
                             <Image Source="/Resource/编号.png" Width="60" Height="35"></Image>
-                            <TextBox Name="txtBianHao" IsEnabled="True" TextChanged="txtBianHao_TextChanged"></TextBox>
-                            <Button FontSize="20" Padding="20,0" Height="35">重置</Button>
-                            <TextBlock Name="txbHandInput" Margin="10,0" FontFamily="/MesToPlc;component/#iconfont" Text="&#xe664;" Visibility="Visible"></TextBlock>
+                            <TextBox Name="txtBianHaoShow" IsEnabled="False"  TextChanged="txtBianHao_TextChanged"></TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="40,15,0,5">
+                            <TextBox Name="txtBianHao" IsEnabled="True"  TextChanged="txtBianHao_TextChanged" Margin="70,0,10,0"></TextBox>
+                            <Button Name="btnReset" Click="btnReset_Click" FontSize="20" Padding="20,0" Height="35">重置</Button>
+                            <TextBlock x:Name="txbHandInput" Margin="10,0" FontFamily="/MesToPlc;component/#iconfont" Text="&#xE664;" Visibility="Visible" MouseDown="txbHandInput_MouseDown"/>
                         </StackPanel>
                         <StackPanel Name="spHandInput" Orientation="Horizontal" Visibility="Visible">
                             <TextBox Name="txtBianHaoHandInput" IsEnabled="True" Margin="110,0,0,0"></TextBox>
-                            <Button Name="btnAddBianHao"  FontSize="20" Margin="10,0" Padding="20,0" Click="btnAddBianHao_Click">添加</Button>
+                            <Button Name="btnAddBianHao"  FontSize="20" Margin="10,0" Padding="20,0" Click="btnAddBianHao_Click">手动添加</Button>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="40,10,0,20">
                             <Image Source="/Resource/电流.png" Width="60" Height="35"></Image>
@@ -59,9 +62,9 @@
                             <TextBlock>V</TextBlock>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="40,10,0,20">
-                            <Image Source="/Resource/cpk.png" Width="60" Height="35"></Image>
-                            <TextBox Name="txtCpk"></TextBox>
-                            <TextBlock>Cycle</TextBlock>
+                            <Image Source="/Resource/焊接时间.png" Width="60" Height="35"></Image>
+                            <TextBox Name="txtWeldTime"></TextBox>
+                            <TextBlock>S</TextBlock>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="40,10,0,20">
                             <Image Source="/Resource/压力.png" Width="60" Height="35"></Image>

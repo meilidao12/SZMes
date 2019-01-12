@@ -27,7 +27,7 @@
                 <!--菜单项为MenuItem，文字使用属性 Header-->
                 <MenuItem Name="MenuClose" Header="关闭" Margin="0,5"></MenuItem>
                 <MenuItem Name="MenuMin" Header="最小化" Margin="0,5"></MenuItem>
-                <MenuItem Name="MenuSet" Header="配置" Margin="0,5"></MenuItem>
+                <!--<MenuItem Name="MenuSet" Header="配置" Margin="0,5"></MenuItem>-->
                 <!--<MenuItem Name="RegisterUser" Header="注册新用户" Margin="0,5"></MenuItem>
                 <MenuItem Name="ChangeUser" Header="切换新用户" Margin="0,5"></MenuItem>
                 <MenuItem Name="AddChengXuHao" Header="添加型号与程序号" Margin="0,5"></MenuItem>-->

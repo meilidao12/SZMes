@@ -131,7 +131,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="bat\ChuangYan.bak" />
     <None Include="bat\Set.ini" />
     <Resource Include="iconfont.ttf" />
     <None Include="packages.config" />
@@ -193,6 +192,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\编号.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\焊接时间.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

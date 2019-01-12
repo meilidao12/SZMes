@@ -143,8 +143,9 @@ namespace Services.DataBase
                 }
                 return null;
             }
-            catch
+            catch(Exception ex)
             {
+                SimpleLogHelper.Instance.WriteLog(LogType.Error, ex);
                 return null;
             }
         }
@@ -195,7 +196,8 @@ namespace Services.DataBase
             {
                 ///抛出类型转换错误
                 //SystemError.CreateErrorLog(ex.Message);
-                throw new Exception(ex.Message, ex);
+                SimpleLogHelper.Instance.WriteLog(LogType.Error, ex);
+                return null;
             }
         }
 
