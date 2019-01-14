@@ -72,17 +72,17 @@ namespace Services
                 }
             }
         }
-        public void InsertTable(System.Data.DataTable dt, Microsoft.Office.Interop.Excel.Worksheet ws, int startX, int startY)
-        {
+        //public void InsertTable(System.Data.DataTable dt, Microsoft.Office.Interop.Excel.Worksheet ws, int startX, int startY)
+        //{
 
-            for (int i = 0; i <= dt.Rows.Count - 1; i++)
-            {
-                for (int j = 0; j <= dt.Columns.Count - 1; j++)
-                {
-                    ws.Cells[startX + i, j + startY] = dt.Rows[i][j];
-                }
-            }
-        }
+        //    for (int i = 0; i <= dt.Rows.Count - 1; i++)
+        //    {
+        //        for (int j = 0; j <= dt.Columns.Count - 1; j++)
+        //        {
+        //            ws.Cells[startX + i, j + startY] = dt.Rows[i][j];
+        //        }
+        //    }
+        //}
         #endregion
 
 
@@ -96,7 +96,8 @@ namespace Services
             {
                 try
                 {
-                    Wb.SaveAs(path, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing
+                    App.AlertBeforeOverwriting = false;
+                    Wb.SaveAs(path, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing
                         , Type.Missing, Type.Missing);
                     return true;
                 }

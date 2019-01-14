@@ -176,7 +176,6 @@ namespace Services.DataBase
                     myDataColumn.ColumnName = dataReader.GetName(i);
                     datatable.Columns.Add(myDataColumn);
                 }
-
                 ///添加表的数据
                 while (dataReader.Read())
                 {

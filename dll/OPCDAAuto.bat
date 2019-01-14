@@ -1,0 +1,2 @@
+regsvr32 Oracle.ManagedDataAccess.dll
+pause

@@ -39,9 +39,10 @@ namespace MesToPlc.Pages
         CharacterConversion characterConversion;
         DispatcherTimer CollectTimer = new DispatcherTimer();
         JsonHelper jsonHelper = new JsonHelper();
-        AccessHelper accessHelper = new AccessHelper();
+        //AccessHelper accessHelper = new AccessHelper();
         bool blClear = false;
-       public OperatePage()
+        ExcelHelper ex;
+        public OperatePage()
         {
             InitializeComponent();
             this.Loaded += OperatePage_Loaded;
@@ -64,6 +65,7 @@ namespace MesToPlc.Pages
 
         private void OperatePage_Loaded(object sender, RoutedEventArgs e)
         {
+            ex = new ExcelHelper();
             string infoFilePath = ini.ReadIni("Config", "JsonUrl");
             if (!System.IO.Directory.Exists(System.IO.Path.GetFullPath(infoFilePath)))
                 System.IO.Directory.CreateDirectory(System.IO.Path.GetFullPath(infoFilePath));
@@ -77,6 +79,21 @@ namespace MesToPlc.Pages
                 AddLog("连接数据库失败");
                 SimpleLogHelper.Instance.WriteLog(LogType.Info, "连接数据库失败");
             }
+            string commandtext = string.Format("Select VOLTAGE1,CURRENT1,PRESSURE,TEMPERATURE,WELDTIME1 FROM welddata_spot");
+            DataTable dt = sql.GetDataTable1(commandtext);
+            SimpleLogHelper.Instance.WriteLog(LogType.Info, dt.Rows[0]["VOLTAGE1"].ToString());
+            //
+            //InstrumentParameters par = new InstrumentParameters();
+            //foreach (DataRow item in dt.Rows)
+            //{
+            //    par.Current = item["CURRENT1"].ToString();
+            //    par.Voltage = item["VOLTAGE1"].ToString();
+            //    par.Pressure = item["PRESSURE"].ToString();
+            //    par.Temperature = item["TEMPERATURE"].ToString();
+            //    par.WeldTime = item["WELDTIME1"].ToString();
+            //    string a = string.Format("CURRENT1:{0},VOLTAGE1:{1},PRESSURE:{2},TEMPERATURE:{3},WELDTIME1:{4}",par.Current,par.Voltage,par.Pressure,par.Temperature,par.WeldTime);
+            //    SimpleLogHelper.Instance.WriteLog(LogType.Info, a);
+            //}
             this.CollectTimer.Interval = TimeSpan.FromSeconds(1);
             this.CollectTimer.Tick += CollectTimer_Tick;
         }
@@ -112,9 +129,9 @@ namespace MesToPlc.Pages
                     log = DateTime.Now + ": " + log;
                     this.lstInfoLog.Items.Add(log);
                     SimpleLogHelper.Instance.WriteLog(LogType.Info, log);
-                    Decorator decorator = (Decorator)VisualTreeHelper.GetChild(lstInfoLog, 0);
-                    ScrollViewer scrollViewer = (ScrollViewer)decorator.Child;
-                    scrollViewer.ScrollToEnd();
+                    //Decorator decorator = (Decorator)VisualTreeHelper.GetChild(lstInfoLog, 0);
+                    //ScrollViewer scrollViewer = (ScrollViewer)decorator.Child;
+                    //scrollViewer.ScrollToEnd();
                     if (this.lstInfoLog.Items.Count >= 60)
                     {
                         int ClearLstCount = lstInfoLog.Items.Count - 60;
@@ -140,9 +157,18 @@ namespace MesToPlc.Pages
 
         private void btnAddBianHao_Click(object sender, RoutedEventArgs e)
         {
-            this.txtBianHao.Text = this.txtBianHaoHandInput.Text;
-            this.txtBianHaoHandInput.Text = "";
-            //---
+            //检查是否是重复插入
+            //string commandText = string.Format("Select * from Model Where BianHao='{0}'", this.txtBianHaoHandInput.Text);
+            //List<Model> models = accessHelper.GetDataTable<Model>(commandText);
+            //if (models.Count == 0)
+            //{
+                this.txtBianHao.Text = this.txtBianHaoHandInput.Text;
+                this.txtBianHaoHandInput.Text = "";
+            //}
+            //else
+            //{
+            //    AddLog("该编号已存在");
+            //}
         }
 
         private void txtBianHao_TextChanged(object sender, TextChangedEventArgs e)
@@ -153,27 +179,31 @@ namespace MesToPlc.Pages
                 return;
             }
             if (this.txtBianHao.Text.Length <= 2) return;
-            if (blClear)
-            {
-                blClear = false;
-                return;
-            }
-            e.Handled = true;
             //检查是否是重复插入
-            string commandText = string.Format("Select * from Model Where BianHao='{0}'", this.txtBianHaoHandInput.Text);
-            List<Model> models = accessHelper.GetDataTable<Model>(commandText);
-            if(models.Count ==0)
-            {
-                //结束老的
-                FinishNow();
-                //开始新的
-                StartAnother();
-                blClear = false;
-            }
-            else
-            {
-                AddLog("该编号已存在");
-            }
+            //string commandText = string.Format("Select * from Model Where BianHao='{0}'", this.txtBianHaoHandInput.Text);
+            //accessHelper.GetDataTable<Model>(commandText);
+            //List<Model> models = accessHelper.GetDataTable<Model>(commandText);
+            //SimpleLogHelper.Instance.WriteLog(LogType.Info, models);
+            //SimpleLogHelper.Instance.WriteLog(LogType.Info, models.Count);
+            //if (models.Count == 0)
+            //{
+            //    if (blClear)
+            //    {
+            //        blClear = false;
+            //        return;
+            //    }
+            //    e.Handled = true;
+            //    //结束老的
+            FinishNow();
+            //开始新的
+            StartAnother();
+            //blClear = false;
+            //}
+            //else
+            //{
+            //    this.txtBianHao.Clear();
+            //    AddLog("该编号已存在");
+            //}
         }
 
         /// <summary>
@@ -224,29 +254,38 @@ namespace MesToPlc.Pages
                     {
                         sql.Open();
                     }
-                    string commandtext = string.Format("Select * FROM welddata_spot where ID >= '{0}'", id);
+                    string commandtext = string.Format("Select VOLTAGE1,CURRENT1,PRESSURE,TEMPERATURE,WELDTIME1 FROM welddata_spot where ID >= '{0}'", id);
                     DataTable dt = sql.GetDataTable1(commandtext);
                     if (dt != null)
                     {
                         AddLog("共获取" + dt.Rows.Count + "记录");
-                        foreach (DataRow dr in dt.Rows)
+                        InstrumentParameters par = new InstrumentParameters();
+                        JsonHelper js = new JsonHelper();
+                        foreach (DataRow item in dt.Rows)
                         {
-                            InstrumentParameters par = new InstrumentParameters()
-                            {
-                                Current = dr["CURRENT1"].ToString(),
-                                Voltage = dr["VOLTAGE1"].ToString(),
-                                Temperature = dr["TEMPERATURE"].ToString(),
-                                Pressure = dr["PRESSURE"].ToString(),
-                                WeldTime = dr["WELDTIME1"].ToString()
-                            };
-                            this.jsonHelper.AppendWrite<InstrumentParameters>(index + ".json", par);
+                            par.Current = item["CURRENT1"].ToString();
+                            par.Voltage = item["VOLTAGE1"].ToString();
+                            par.Pressure = item["PRESSURE"].ToString();
+                            par.Temperature = item["TEMPERATURE"].ToString();
+                            par.WeldTime = item["WELDTIME1"].ToString();
+                            //ex.Open(System.AppDomain.CurrentDomain.BaseDirectory + @"\Test.xlsx");
+                            //ex.InsertTable(dt, "Sheet1", 2, 1);
+                            //string infoFilePath = ini.ReadIni("Config", "JsonUrl");
+                            //ex.SaveAs(infoFilePath + index + ".xlsx");
+                            //ex.Close();
+                            js.AppendWrite<InstrumentParameters>(this.txtBianHaoShow.Text + ".json", par);
                         }
+                        
                     }
-                    commandtext = string.Format("insert into model ([BianHao],[AddTime1]) values ('{0}','{1}')",txtBianHaoShow.Text,DateTime.Now);
-                    if(accessHelper.Execute(commandtext))
-                    {
-                        AddLog("数据保存成功");
-                    }
+                    //commandtext = string.Format("insert into model ([BianHao],[AddTime1]) values ('{0}','{1}')",txtBianHaoShow.Text,DateTime.Now);
+                    //if(accessHelper.Execute(commandtext))
+                    //{
+                    //    //foreach(var item in dt.Rows)
+                    //    //{
+                    //    //    commandtext = string.Format("insert into modeldetail ([VOLTAGE1],[CURRENT1],[PRESSURE],[TEMPERATURE],[WELDTIME1],[BianHao]) values ('{0}','{1}','{2}','{3}','{4}','{5}')",item["VOLTAGE"].ToString(), txtBianHaoShow.Text);
+                    //    //}
+                    AddLog("数据保存成功");
+                    //}
                 }
                 this.txtWeldTime.Text = "";
                 this.txtWenDu.Text = "";

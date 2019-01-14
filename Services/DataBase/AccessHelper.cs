@@ -81,7 +81,10 @@ namespace Services.DataBase
         public List<T> GetDataTable<T>(string commandText) where T :new()
         {
             DataSet ds;
-            oledb.GetDataSet(commandText, out ds);
+            if(!oledb.GetDataSet(commandText, out ds))
+            {
+                return null;
+            }
             if (ds.Tables.Count == 0) return null;
             DataTable dt = ds.Tables[0];
             List<T> list = new List<T>();             
